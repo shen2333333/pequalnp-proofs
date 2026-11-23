@@ -7,3 +7,6 @@
 .DS_Store
 .vscode/
 .idea/
+
+# the agent helper keeps its leases here
+.pnp/

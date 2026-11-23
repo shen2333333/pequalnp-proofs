@@ -8,6 +8,7 @@ import PEqualNP.Defs.MetaComplexityMinimal
 import PEqualNP.Defs.MetaComplexityLgp
 import PEqualNP.Defs.MetaComplexityLgpMono
 import PEqualNP.Defs.BinaryCircuit
+import PEqualNP.Defs.MetaComplexityCoverCircuit
 import PEqualNP.Defs.ProofComplexity
 import PEqualNP.Defs.ProofComplexityLin
 import PEqualNP.Defs.ProofComplexityLinK
@@ -36,6 +37,15 @@ import PEqualNP.Defs.CoverPromise
 import PEqualNP.Defs.SingleLevel
 import PEqualNP.Defs.DeMorganFormula
 import PEqualNP.Defs.MetaComplexityTypedRank
+import PEqualNP.Defs.Pebble
+import PEqualNP.Defs.Subdivision
+import PEqualNP.Defs.AndCountCircuit
+import PEqualNP.Defs.PebbleThreeWay
+import PEqualNP.Defs.CoLevel
+import PEqualNP.Defs.Peelable
+import PEqualNP.Defs.NestedCoverCircuit
+import PEqualNP.Defs.LiteralPartition
+import PEqualNP.Defs.MinimumComplex
 
 /-!
 # The definitions root

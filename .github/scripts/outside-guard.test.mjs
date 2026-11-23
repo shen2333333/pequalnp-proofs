@@ -14,7 +14,7 @@ const passes = (name, body) => test(`passes: ${name}`, () => { assert.deepEqual(
 const thm = 'theorem PEqualNP.Outside.L_x_1 : True := trivial\n';
 const by = (tac) => `theorem PEqualNP.Outside.L_x_1 : True := by\n  ${tac}\n`;
 
-refused('an initialize', `initialize pure ()\n${thm}`, 'column 0');
+refused('an initialize', `initialize pure ()\n${thm}`, 'initialize');
 refused('an indented initialize', `${thm}  initialize pure ()\n`, 'initialize');
 refused('run_cmd, indented', `${thm} run_cmd pure ()\n`, 'run_cmd');
 refused('#eval', `${thm} #eval 1\n`, '#');
@@ -23,12 +23,11 @@ refused('an elaborator, indented', `${thm} elab x : term => pure default\n`, 'el
 refused('a macro, indented', `${thm} macro x : tactic => y\n`, 'macro');
 refused('notation3', `${thm} notation3 x => y\n`, 'notation');
 refused('an attribute command', `${thm} attribute [simp] Nat.add_comm\n`, 'attribute');
-refused('a generating attribute', `@[to_additive] theorem foo : True := trivial\n${thm}`, 'column 0');
-refused('an option that is not a limit', `set_option debug.skipKernelTC true in\n${thm}`, 'column 0');
+refused('a generating attribute', `@[to_additive] theorem foo : True := trivial\n${thm}`, '@[');
+refused('an option that is not a limit', `set_option debug.skipKernelTC true in\n${thm}`, 'set_option');
 refused('an indented option that is not a limit', by('set_option debug.skipKernelTC true in\n  trivial'), 'set_option');
-refused('a same-line option that is not a limit', `set_option maxHeartbeats 1 in set_option debug.skipKernelTC true in\n${thm}`, 'column 0');
+refused('a same-line option that is not a limit', `set_option maxHeartbeats 1 in set_option debug.skipKernelTC true in\n${thm}`, 'set_option');
 refused('an axiom', `${thm} axiom a : False\n`, 'axiom');
-refused('an instance', `${thm} instance : Inhabited Nat := y\n`, 'instance');
 refused('sorry', by('sorry'), 'sorry');
 refused('sorryAx', 'theorem PEqualNP.Outside.L_x_1 : False := sorryAx _\n', 'sorry');
 refused('lcProof', 'theorem PEqualNP.Outside.L_x_1 : False := lcProof\n', 'lcProof');
@@ -44,9 +43,11 @@ refused('polyrith', by('polyrith'), 'polyrith');
 refused('a string literal', `private def s : String := "x"\n${thm}`, '"');
 refused('a character-literal trick', `${thm}  -- '"'\n`, '"');
 refused('a quoted identifier', `private def «a» : Nat := 1\n${thm}`, '«');
-refused('a line comment that opens a block', `-- a note /- here\nexample : True := trivial\n-- done -/\n${thm}`, 'comment marker');
-refused('a command after a comment on one line', `/- note -/ initialize pure ()\n${thm}`, 'comment marker');
-refused('example', `example : True := trivial\n${thm}`, 'column 0');
+refused('code hidden behind a comment trick', `-- a note /- here\n  initialize pure ()\n-- done -/\n${thm}`, 'initialize');
+refused('a command after a comment on one line', `/- note -/ initialize pure ()\n${thm}`, 'initialize');
+refused('a syntax quotation', by('exact \x60(tactic| trivial)'), '(tactic|');
+refused('#check', `#check Nat\n${thm}`, '#check');
+refused('#print axioms, indented', `${thm}  #print axioms Nat.add_comm\n`, '#print');
 refused('a direction-changing character', `-- ‮\n${thm}`, 'invisible');
 refused('no theorem at all', 'def x : Nat := 1\n', 'no theorem');
 
@@ -56,4 +57,8 @@ passes('a block comment with indented prose', `/-\n  The idea of the proof,\n  i
 passes('the simp attributes', `@[simp] private theorem a : True := trivial\n@[local simp] private theorem b : True := trivial\n${thm}`);
 passes('the four limit options', `set_option maxHeartbeats 400000 in\nset_option maxRecDepth 2000 in\n${thm}`);
 passes('an indented limit option inside a proof', by('set_option maxRecDepth 2000 in\n  trivial'));
+passes('comment prose at column 0 and a heading (form is not judged)', `/-!\n# A heading\n\nProse that starts in column 0,\nover two lines.\n-/\n${thm}`);
+passes('a small enumerated type and an instance', `private inductive Stack | input | output\n  deriving DecidableEq\n\nprivate instance : Inhabited Stack := ⟨.input⟩\n${thm}`);
+passes('open scoped, and a cardinality written with a hash', `open scoped BigOperators\ntheorem PEqualNP.Outside.L_x_1 (s : Finset ℕ) : #s = #s := rfl\n`);
+passes('a pair in backticks inside a doc comment', '/-- The coordinates \x60(a, b, c, d)\x60 of the block. -/\n' + thm);
 passes('lemma names that contain add_', by('simp only [Nat.add_comm, add_zero]'));
